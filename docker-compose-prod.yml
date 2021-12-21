@@ -1,0 +1,32 @@
+version: "3"
+services:
+    api:
+      image: tommypnguyen1/fastapi-course
+      ports:
+        - 80:8000
+      environment:
+        # We can reference postgres service name, so database hostnaem will link to that
+        - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+        - DATABASE_PORT=${DATABASE_PORT}
+        - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+        - DATABASE_NAME=${DATABASE_NAME}
+        - DATABASE_USERNAME=${DATABASE_USERNAME}
+        - SECRET_KEY=${SECRET_KEY}
+        - ALGORITHM=${ALGORITHM}
+        - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      # Waits for postgres container to start before starting api service
+      depends_on:
+        - postgres
+    
+    postgres:
+      image: postgres
+      environment:
+        - POSTGRES_PASSWORD = password123
+        - POSTGRES_DB = fastapi
+      # Volumes allow us to save data from a container onto our local machine, so if we kill a container, when it comes up it can pull from 
+      # this volume
+      volumes:
+        - postgres-db:/var/lib/postgresql/data
+  
+volumes:
+  postgres-db:
