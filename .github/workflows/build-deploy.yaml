@@ -3,7 +3,7 @@ name: Build and Deploy Code
 on: [push, pull_request]
 
 jobs:
-  job1:
+  build:
     environment:
       name: testing
     env:
@@ -44,21 +44,35 @@ jobs:
         run: |
           pip install pytest
           pytest -v -s
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v1
+      #   with:
+      #     username: ${{ secrets.DOCKER_HUB_USERNAME  }}
+      #     password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      # - name: Set up Docker Buildx
+      #   id: buildx
+      #   uses: docker/setup-buildx-action@v1
+      # - name: Build and Push
+      #   id: docker_build
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: ./
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-course:latest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build]
+    environment:
+      name: production
+    steps:
+      - name: Check out Git Repository ${{ github.repository }}
+        uses: actions/checkout@v2
+      - name: Deploying to Heroku
+        uses: akhileshhns/heroku-deploy@v3.12.12
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME  }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Build and Push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fastapi-course:latest
-      
-      
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        
+    
