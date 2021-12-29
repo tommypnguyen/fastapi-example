@@ -6,7 +6,7 @@ jobs:
   job1:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out Git Repository ${{ git.repository }}
+      - name: Check out Git Repository ${{ github.repository }}
         uses: action/checkout@v2
       - name: Echo to user
         run: echo "Hello Tommy"
